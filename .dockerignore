@@ -1,0 +1,15 @@
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+*.md
+.vscode/
+.DS_Store
+docker-compose.yml
+docker-compose.prod.yml
+Dockerfile
+.env
+.env.example
+.github/
+universidade-cli/

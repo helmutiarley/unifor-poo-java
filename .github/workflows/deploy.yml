@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 177.7.44.43
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          envs: POSTGRES_PASSWORD
+          script: |
+            set -e
+            cd /opt/biblioteca-api
+            git pull origin main
+
+            # Write .env from GitHub secret (overwrites every deploy)
+            cat > .env <<EOF
+            POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            EOF
+            chmod 600 .env
+
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker image prune -f
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
